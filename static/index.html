@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>Sagasu - Discover the web</title>
+  <style>
+    :root { color-scheme: light; --ink:#182230; --muted:#667085; --line:#e4e7ec; --blue:#365cf5; --bg:#f7f8fc; }
+    * { box-sizing:border-box }
+    .logo {
+    object-fit: contain;}
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    .top { display:flex; align-items:center; justify-content:space-between; padding:20px clamp(18px,5vw,64px); }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.04em; font-size:21px; }
+    .mark { display:grid; place-items:center; width:35px;height:35px;border-radius:12px;background:var(--blue);color:white;box-shadow:0 5px 16px #365cf52e; }
+    .pill { border:1px solid var(--line); border-radius:99px; padding:7px 12px; color:var(--muted); font-size:12px; background:white; }
+    main { width:min(820px,calc(100% - 32px)); margin:clamp(45px,10vh,110px) auto 70px; }
+    .hero { text-align:center; margin-bottom:28px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border:1px solid #e5e9ff; background:#f0f3ff; border-radius:99px; color:#365cf5; font-size:12px; font-weight:700; }
+    h1 { font-size:clamp(42px,7vw,68px); line-height:1.03; letter-spacing:-.065em; margin:20px 0 14px; }
+    h1 span { color:var(--blue); }
+    .sub { color:var(--muted); margin:0 auto; max-width:490px; }
+    form.search { display:flex; align-items:center; gap:10px; background:white; padding:8px; border:1px solid #e2e6ee; box-shadow:0 10px 34px #1822300b; border-radius:18px; margin:28px 0 12px; }
+    .search input { flex:1; min-width:0; border:0; outline:0; font:inherit; padding:11px 10px; background:transparent; color:var(--ink); }
+    button { cursor:pointer; font:inherit; border:0; border-radius:12px; padding:11px 17px; background:var(--blue); color:white; font-weight:700; transition:transform .15s,opacity .15s; }
+    button:hover { transform:translateY(-1px); } button:disabled { opacity:.55; cursor:wait; }
+    .hint { text-align:center; color:#98a2b3; font-size:12px; }
+    .results { margin-top:35px; }
+    .results-head { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:13px; margin-bottom:14px; }
+    .result { padding:17px 0 20px; border-bottom:1px solid var(--line); }
+    .result-url { color:#667085; font-size:12px; overflow-wrap:anywhere; }
+    .result h3 { margin:4px 0 5px; font-size:20px; letter-spacing:-.025em; line-height:1.3; }
+    .result h3 a { color:#2448c9; text-decoration:none; } .result h3 a:hover { text-decoration:underline; }
+    .result p { color:#475467; font-size:14px; margin:0; line-height:1.65; }
+    .empty { padding:25px; border:1px dashed #d0d5dd; border-radius:16px; color:var(--muted); text-align:center; background:#ffffff80; }
+    details { margin-top:45px; border:1px solid var(--line); border-radius:18px; background:white; overflow:hidden; }
+    summary { cursor:pointer; padding:17px 20px; font-weight:750; list-style:none; display:flex; justify-content:space-between; gap:12px; }
+    summary:after { content:"＋"; color:var(--blue); }
+    details[open] summary:after { content:"−"; }
+    .crawl-body { padding:0 20px 20px; border-top:1px solid #f0f1f5; }
+    .crawl-body p { color:var(--muted); font-size:13px; }
+    label { display:block; font-size:13px; font-weight:700; margin:12px 0 6px; }
+    textarea, input[type=number] { width:100%; border:1px solid #d0d5dd; border-radius:10px; padding:11px 12px; font:inherit; outline-color:var(--blue); background:white; }
+    textarea { min-height:88px; resize:vertical; }
+    .crawl-row { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:12px 0; }
+    .crawl-row label { margin:0; font-weight:500; display:flex; gap:7px; align-items:center; }
+    .crawl-row input[type=number] { width:95px; }
+    .status { font-size:13px; color:var(--muted); white-space:pre-wrap; margin-top:12px; }
+    .foot { text-align:center; color:#98a2b3; font-size:12px; margin-top:35px; }
+    @media(max-width:540px) { .top{padding:16px} .pill{display:none} form.search{border-radius:15px} form.search button{padding:10px 12px} main{margin-top:45px} }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+        <img class="logo" src="/static/sagasu-logo.png" alt="Sagasu" width="200" height="100">
+    </div>
+    <span class="pill" id="stats">Your index · loading…</span>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">✦ YOUR OWN CRAWLER. YOUR OWN INDEX.</div>
+      <h1>Search beyond<br><span>the obvious.</span></h1>
+      <p class="sub">A small search engine you can run, inspect, and grow. No third-party search API.</p>
+    </section>
+
+    <form class="search" id="searchForm">
+      <span style="padding-left:8px;color:#98a2b3">⌕</span>
+      <input id="query" type="search" placeholder="Search pages you've indexed…" autocomplete="off" required>
+      <button id="searchBtn" type="submit">Search ↗</button>
+    </form>
+    <div class="hint">Results come from your own local index, not Google or Bing.</div>
+
+    <section class="results" id="results" aria-live="polite"></section>
+
+    <details>
+      <summary><span>Grow your index <span style="font-weight:400;color:#667085">· crawl websites</span></span></summary>
+      <div class="crawl-body">
+        <p>Enter public website URLs to start crawling. The crawler follows links, checks robots.txt, and indexes HTML text in your local SQLite database. Start small and crawl responsibly.</p>
+        <form id="crawlForm">
+          <label for="seeds">Starting URLs (one per line)</label>
+          <textarea id="seeds" required placeholder="https://example.com&#10;https://www.python.org"></textarea>
+          <div class="crawl-row">
+            <label>Max pages <input id="maxPages" type="number" min="1" max="200" value="25"></label>
+            <label><input id="sameDomain" type="checkbox" checked> Stay on the same domain</label>
+          </div>
+          <button id="crawlBtn" type="submit">Start crawling</button>
+          <div class="status" id="crawlStatus"></div>
+        </form>
+      </div>
+    </details>
+    <div class="foot">Sagasu · built from the ground up for learning · crawler politely checks robots.txt</div>
+  </main>
+<script>
+const $ = (id) => document.getElementById(id);
+async function refreshStats() {
+  try {
+    const r = await fetch('/api/stats'); const d = await r.json();
+    $('stats').textContent = `${d.indexed_pages.toLocaleString()} pages indexed`;
+  } catch { $('stats').textContent = 'Local search index'; }
+}
+function safeUrl(url) {
+  try { const u = new URL(url); return ['http:', 'https:'].includes(u.protocol) ? u.href : '#'; }
+  catch { return '#'; }
+}
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function renderResults(data) {
+  const el = $('results');
+  if (!data.results?.length) {
+    el.innerHTML = `<div class="empty"><strong>No indexed matches yet.</strong><br>Try another query, or open “Grow your index” and crawl a website first.</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="results-head"><span>Results for <strong>${escapeHtml(data.query)}</strong></span><span>${data.total} shown</span></div>` +
+    data.results.map(r => `<article class="result">
+      <div class="result-url">${escapeHtml(r.url)}</div>
+      <h3><a href="${escapeHtml(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title || r.url)}</a></h3>
+      <p>${escapeHtml(r.snippet || r.description || '')}</p>
+    </article>`).join('');
+}
+$('searchForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const q = $('query').value.trim(); if (!q) return;
+  $('searchBtn').disabled = true; $('searchBtn').textContent = 'Searching…';
+  $('results').innerHTML = '<div class="empty">Searching your index…</div>';
+  try {
+    const r = await fetch('/api/search?q=' + encodeURIComponent(q));
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Search failed');
+    renderResults(d);
+  } catch (err) {
+    $('results').innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+  } finally { $('searchBtn').disabled = false; $('searchBtn').textContent = 'Search ↗'; }
+});
+$('crawlForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const seeds = $('seeds').value.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  $('crawlBtn').disabled = true; $('crawlBtn').textContent = 'Crawling…';
+  $('crawlStatus').textContent = 'Fetching pages and building your index. This may take a little while.';
+  try {
+    const r = await fetch('/api/crawl', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({seeds, max_pages:Number($('maxPages').value), same_domain_only:$('sameDomain').checked})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Crawl failed');
+    $('crawlStatus').textContent = `${d.message}\nIndexed this run: ${d.indexed_this_run}\nSkipped: ${d.skipped}\nVisited: ${d.visited}\n${d.note}`;
+    await refreshStats();
+  } catch (err) { $('crawlStatus').textContent = 'Error: ' + err.message; }
+  finally { $('crawlBtn').disabled = false; $('crawlBtn').textContent = 'Start crawling'; }
+});
+refreshStats();
+</script>
+</body>
+</html>
